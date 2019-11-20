@@ -17,7 +17,7 @@ namespace ManagedWebhook
     {
         [FunctionName("ChronJob")]
         public static async Task Run(
-            [TimerTrigger("*/30 * * * * *")]TimerInfo timerInfo,
+            [TimerTrigger("0 0 */1 * * *")]TimerInfo timerInfo,
             [CosmosDB(
                 databaseName: Webhook.DatabaseName,
                 collectionName: Webhook.CollectionName,

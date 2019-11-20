@@ -25,7 +25,7 @@
         },
         "dimensionConfig": {
             "type": "string",
-            "defaultValue": "[[{\"dimension\":\"firstDimension\", \"quantity\":3}, {\"dimension\":\"secondDimension\", \"quantity\":1000}]]",
+            "defaultValue": "[[{\"dimension\":\"firstDimension\", \"quantity\":3}, {\"dimension\":\"secondDimension\", \"quantity\":1000}]",
             "metadata": {
                 "description": "The dimension and quantity config for the chron job to send billing metrics."
             }
@@ -62,10 +62,11 @@
     "variables": {
         "cosmosDBDatabaseName": "Applications",
         "cosmosDBContainerName": "Billing",
-        "cosmosDBAccountName": "[concat(parameters('functionName'),uniqueString(resourceGroup().id))]",
-        "storageAccountName": "[concat(parameters('functionName'),uniqueString(resourceGroup().id))]",
-        "identityName": "[concat(parameters('functionName'),uniqueString(resourceGroup().id))]",
-        "appInsightsName": "[concat(parameters('functionName'),uniqueString(resourceGroup().id))]"        
+        "resourceName": "[toLower(substring(concat(parameters('functionName'),uniqueString(resourceGroup().id)),0,24))]",
+        "cosmosDBAccountName": "[variables('resourceName')]",
+        "storageAccountName": "[variables('resourceName')]",
+        "identityName": "[variables('resourceName')]",
+        "appInsightsName": "[variables('resourceName')]"
     },
     "resources": [
         {
@@ -208,6 +209,10 @@
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-02-01').keys[0].value)]"
                         },
                         {
+                            "name": "AzureWebJobsSecretStorageType",
+                            "value": "Files"
+                        },
+                        {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-02-01').keys[0].value)]"
                         },
@@ -248,10 +253,11 @@
                             "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('identityName')), '2018-11-30').clientId]"
                         }
                     ],
-                    "connectionStrings": [                        
+                    "connectionStrings": [
                         {
                             "name": "CosmosDBConnectionString",
-                            "value": "[listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDBAccountName')), '2019-08-01').connectionStrings[0].connectionString]"
+                            "connectionString": "[listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDBAccountName')), '2019-08-01').connectionStrings[0].connectionString]",
+                            "type": ""
                         }
                     ]
                 },
@@ -275,7 +281,7 @@
         },
         "webhookEndpoint": {
             "type": "string",
-            "value": "[replace(listSecrets(resourceId('Microsoft.Web/sites/functions', parameters('functionName'), 'Webhook'), '2019-08-01').trigger_url, '/resource?', '?')]"
+            "value": "[replace(listSecrets(resourceId('Microsoft.Web/sites/functions', parameters('functionName'), 'Webhook'), '2019-08-01').trigger_url, '/Webhook?', concat('?sig=',parameters('urlSignature'),'&'))]"
         }
     }
 }
