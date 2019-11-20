@@ -62,7 +62,7 @@
     "variables": {
         "cosmosDBDatabaseName": "Applications",
         "cosmosDBContainerName": "Billing",
-        "resourceName": "[toLower(substring(concat(parameters('functionName'),uniqueString(resourceGroup().id)),0,24))]",
+        "resourceName": "[toLower(take(concat(parameters('functionName'),uniqueString(resourceGroup().id)),24))]",
         "cosmosDBAccountName": "[variables('resourceName')]",
         "storageAccountName": "[variables('resourceName')]",
         "identityName": "[variables('resourceName')]",
