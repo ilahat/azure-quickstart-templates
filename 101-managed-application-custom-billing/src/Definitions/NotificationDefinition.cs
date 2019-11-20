@@ -32,9 +32,9 @@ namespace ManagedWebhook.Definitions
         public Plan Plan { get; set; }
 
         /// <summary>
-        /// Gets or sets the resource usage identifier.
+        /// Gets or sets the billing details.
         /// </summary>
         [JsonProperty(Required = Required.Default)]
-        public string ResourceUsageId { get; set; }
+        public BillingDetailsDefinition BillingDetails { get; set; }
     }
 }

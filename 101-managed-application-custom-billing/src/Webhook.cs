@@ -77,7 +77,7 @@ namespace ManagedWebhook
                 if (notificationDefinition.Plan != null)
                 {
                     // If provisioning of a marketplace application instance is successful, we persist a billing entry to be picked up by the chron metric emitting job
-                    if (notificationDefinition.EventType == "PUT" && notificationDefinition.ProvisioningState == "Succeeded" && notificationDefinition.ResourceUsageId != null)
+                    if (notificationDefinition.EventType == "PUT" && notificationDefinition.ProvisioningState == "Succeeded" && notificationDefinition.BillingDetails?.BillingId != null)
                     {
                         var billingEntry = new BillingEntry
                         {
@@ -86,7 +86,7 @@ namespace ManagedWebhook
 
                             planId = notificationDefinition.Plan.Name,
 
-                            resourceUsageId = notificationDefinition.ResourceUsageId
+                            resourceUsageId = notificationDefinition.BillingDetails.BillingId
                         };
 
                         await documentClient
