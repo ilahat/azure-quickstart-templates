@@ -8,9 +8,9 @@ namespace ManagedWebhook.Definitions
     public class BillingDetailsDefinition
     {
         /// <summary>
-        /// Gets or sets the application billing id.
+        /// Gets or sets the resource usage id.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public string BillingId { get; set; }
+        public string ResourceUsageId { get; set; }
     }
 }
