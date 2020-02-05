@@ -165,30 +165,15 @@
             }
         },
         {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "name": "roleAssignmentNestedTemplate2",
-            "resourceGroup": "[variables('applicationResourceGroupName')]",
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2019-04-01-preview",
+            "name": "[parameters('resourceGroupRoleAssignment')]",
             "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "resources": [
-                        {
-                            "type": "Microsoft.Authorization/roleAssignments",
-                            "apiVersion": "2019-04-01-preview",
-                            "name": "[parameters('resourceGroupRoleAssignment')]",
-                            "properties": {
-                                "roleDefinitionId": "[concat(subscription().id, '/providers/Microsoft.Authorization/roleDefinitions/', variables('msiAccessRoleId'))]",
-                                "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('functionName')), '2018-11-01', 'Full').identity.principalId]",
-                                "delegatedManagedIdentityResourceId": "[concat(resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('functionName'))]",
-                                "scope": "[resourceGroup().id]",
-                                "principalType": "ServicePrincipal"
-                            }
-                        }
-                    ]
-                }
+                "roleDefinitionId": "[concat(subscription().id, '/providers/Microsoft.Authorization/roleDefinitions/', variables('msiAccessRoleId'))]",
+                "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('functionName')), '2018-11-01', 'Full').identity.principalId]",
+                "delegatedManagedIdentityResourceId": "[concat(resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('functionName'))]",
+                "scope": "[resourceGroup().id]",
+                "principalType": "ServicePrincipal"
             },
             "dependsOn": [
                 "[concat('Microsoft.Web/sites/', parameters('functionName'))]"
@@ -212,7 +197,7 @@
                             "properties": {
                                 "roleDefinitionId": "[concat(subscription().id, '/providers/Microsoft.Authorization/roleDefinitions/', variables('msiAccessRoleId'))]",
                                 "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('functionName')), '2018-11-01', 'Full').identity.principalId]",
-                                "delegatedManagedIdentityResourceId": "[concat(resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('functionName'))]",
+                                "delegatedManagedIdentityResourceId": "[concat(resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('functionName'))]",
                                 "scope": "[variables('managedApplicationId')]",
                                 "principalType": "ServicePrincipal"
                             }
@@ -226,21 +211,5 @@
         }
     ],
     "outputs": {
-        "identityApplicationId": {
-            "type": "string",
-            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('identityName')), '2018-11-30').clientId]"
-        },
-        "identityPrincipalId": {
-            "type": "string",
-            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('identityName')), '2018-11-30').principalId]"
-        },
-        "tenantId": {
-            "type": "string",
-            "value": "[subscription().tenantId]"
-        },
-        "webhookEndpoint": {
-            "type": "string",
-            "value": "[replace(listSecrets(resourceId('Microsoft.Web/sites/functions', parameters('functionName'), 'Webhook'), '2019-08-01').trigger_url, '/Webhook?', concat('?sig=',parameters('urlSignature'),'&'))]"
-        }
     }
 }
